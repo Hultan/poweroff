@@ -69,7 +69,7 @@ func (m *MainForm) OpenMainForm(app *gtk.Application) (err error) {
 
 	actions := m.getActions()
 	for _, a := range actions {
-		m.AddButton(app, grid, a)
+		m.AddButton(grid, a)
 	}
 
 	TransparentBackground(win)
@@ -105,7 +105,7 @@ func (m *MainForm) KeyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
 	}
 }
 
-func (m *MainForm) AddButton(app *gtk.Application, grid *gtk.Grid, a action) (err error) {
+func (m *MainForm) AddButton(grid *gtk.Grid, a action) (err error) {
 	p := path.Join("/home/per/code/poweroff/assets", a.iconName)
 	image, err := gtk.ImageNewFromFile(p)
 	if err != nil {
@@ -118,7 +118,6 @@ func (m *MainForm) AddButton(app *gtk.Application, grid *gtk.Grid, a action) (er
 	}
 	btn.SetImage(image)
 	btn.Connect("clicked", a.action)
-
 	btn.SetTooltipText(a.tooltip)
 
 	lbl, err := gtk.LabelNew(a.name)
@@ -126,7 +125,7 @@ func (m *MainForm) AddButton(app *gtk.Application, grid *gtk.Grid, a action) (er
 		return
 	}
 	lbl.SetName("buttonLabel")
-	lbl.SetMarkup("<b>" + a.name + "</b>")
+	lbl.SetMarkup(a.name)
 
 	grid.Attach(btn, a.index, 0, 1, 1)
 	grid.Attach(lbl, a.index, 1, 1, 1)
