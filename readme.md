@@ -1,6 +1,6 @@
 # POWEROFF
 
-A Linux poweroff application written in GTK and Go. The application can:
+A Linux power-off application written in GTK and Go. The application can:
 * Restart the computer
 * Turn off the computer
 * Hibernate the computer
@@ -9,9 +9,11 @@ A Linux poweroff application written in GTK and Go. The application can:
 * Lock the computer
 * Cancel
 
+[Screenshot](assets/screenshot.png)
+
 ## LINKS
 Inspired by DistroTube : https://www.youtube.com/watch?v=ViW-bcNQ6Lc
 
 ## TODO
-* Add a restart cinnamon button
+* Add a restart cinnamon button?
 * Add a start cinnamon debug tool?
