@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-    "github.com/hultan/poweroff/internal/poweroff"
+	"github.com/hultan/poweroff/internal/poweroff"
 
 	"github.com/gotk3/gotk3/glib"
 	"github.com/gotk3/gotk3/gtk"
@@ -22,11 +22,7 @@ func main() {
 	}
 
 	mainForm := poweroff.NewMainForm()
-	// Hook up the activate event handler
 	application.Connect("activate", mainForm.OpenMainForm)
-	if err != nil {
-		panic("Failed to connect Application.Activate event : " + err.Error())
-	}
 
 	// Start the application (and exit when it is done)
 	os.Exit(application.Run(nil))

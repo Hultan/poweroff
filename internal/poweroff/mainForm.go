@@ -3,6 +3,7 @@ package poweroff
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
@@ -29,7 +30,7 @@ func NewMainForm() *MainForm {
 }
 
 // OpenMainForm : Opens the MainForm window
-func (m *MainForm) OpenMainForm(app *gtk.Application) {
+func (m *MainForm) OpenMainForm(app *gtk.Application) (err error) {
 	// Initialize gtk
 	gtk.Init(&os.Args)
 
@@ -49,28 +50,27 @@ func (m *MainForm) OpenMainForm(app *gtk.Application) {
 	m.Window.SetName("mainWindow")
 
 	// Hook up events
-	m.Window.Connect("destroy", m.Cancel)
+	m.Window.Connect("destroy", m.cancel)
 	m.Window.Connect("key-press-event", m.KeyPressed)
-	// m.Window.Connect("draw", m.Draw)
-	// m.Window.Connect("screen-changed", m.ScreenChanged)
 
 	grid, err := gtk.GridNew()
 	if err != nil {
 		panic(err)
 	}
-	grid.SetMarginStart(10)
-	grid.SetMarginTop(10)
-	grid.SetColumnSpacing(10)
+	grid.SetName("grid")
+	// grid.SetBorderWidth(10)
+	// grid.SetMarginStart(10)
+	// grid.SetMarginEnd(10)
+	// grid.SetMarginTop(10)
+	// grid.SetMarginBottom(10)
+	grid.SetColumnSpacing(20)
 	grid.SetHAlign(gtk.ALIGN_CENTER)
 	grid.SetVAlign(gtk.ALIGN_CENTER)
 
-	m.AddButton(grid, 0, "Cancel", "/home/per/code/poweroff/assets/cancel.png", m.Cancel)
-	m.AddButton(grid, 1, "Lock", "/home/per/code/poweroff/assets/lock.png", m.Cancel)
-	m.AddButton(grid, 2, "Logout", "/home/per/code/poweroff/assets/logout.png", m.Cancel)
-	m.AddButton(grid, 3, "Suspend", "/home/per/code/poweroff/assets/suspend.png", m.Cancel)
-	m.AddButton(grid, 4, "Hibernate", "/home/per/code/poweroff/assets/hibernate.png", m.Cancel)
-	m.AddButton(grid, 5, "Shutdown", "/home/per/code/poweroff/assets/shutdown.png", m.Cancel)
-	m.AddButton(grid, 6, "Restart", "/home/per/code/poweroff/assets/restart.png", m.Cancel)
+	actions := m.getActions()
+	for _, a := range actions {
+		m.AddButton(app, grid, a)
+	}
 
 	TransparentBackground(win)
 	m.Window.Add(grid)
@@ -78,6 +78,52 @@ func (m *MainForm) OpenMainForm(app *gtk.Application) {
 	// Show the main window
 	m.Window.ShowAll()
 	gtk.Main()
+
+	return nil
+}
+
+func (m *MainForm) KeyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
+	ke := gdk.EventKeyNewFromEvent(e)
+
+	// fmt.Println("Key pressed:", ke.KeyVal())
+
+	switch ke.KeyVal() {
+	case gdk.KEY_Q:
+		m.cancel()
+	case gdk.KEY_q:
+		m.cancel()
+	case gdk.KEY_Escape:
+		m.cancel()
+	}
+}
+
+func (m *MainForm) AddButton(app *gtk.Application, grid *gtk.Grid, a action) (err error) {
+	p := path.Join("/home/per/code/poweroff/assets", a.iconName)
+	image, err := gtk.ImageNewFromFile(p)
+	if err != nil {
+		return
+	}
+
+	btn, err := gtk.ButtonNew()
+	if err != nil {
+		return
+	}
+	btn.SetImage(image)
+	btn.Connect("clicked", a.action)
+
+	btn.SetTooltipText(a.tooltip)
+
+	lbl, err := gtk.LabelNew(a.name)
+	if err != nil {
+		return
+	}
+	lbl.SetName("buttonLabel")
+	lbl.SetMarkup("<b>" + a.name + "</b>")
+
+	grid.Attach(btn, a.index, 0, 1, 1)
+	grid.Attach(lbl, a.index, 1, 1, 1)
+
+	return
 }
 
 func TransparentBackground(win *gtk.ApplicationWindow) (err error) {
@@ -86,9 +132,30 @@ func TransparentBackground(win *gtk.ApplicationWindow) (err error) {
 #mainWindow {
 	background-color: rgba(255, 255, 255, 0.2);
 }
-label {
+#grid {
+	background-color : #222222;
+	border-top : 20px solid #222222;
+	border-right : 20px solid #222222;
+	border-bottom : 10px solid #222222;
+	border-left : 20px solid #222222;
+	border-top-right-radius: 25px;
+	border-bottom-right-radius: 25px;
+	border-top-left-radius: 25px;
+	border-bottom-left-radius: 25px;
+}
+button {
+	border : 2px solid #666666;
+	background-color : #444444;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+#buttonLabel {
+	background-color : #222222;
+	margin-top : 10px;
 	color: #AAAAAA;
-	font-size: 24px;
+	font-size: 20px;
 }
 `
 		cssProv *gtk.CssProvider
@@ -102,59 +169,15 @@ label {
 	if err = cssProv.LoadFromData(css); err != nil {
 		return
 	}
-
 	if screen, err = gdk.ScreenGetDefault(); err != nil {
 		return
 	}
+
 	gtk.AddProviderForScreen(screen, cssProv, gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 	screen = win.GetScreen()
+
 	if visual, err = screen.GetRGBAVisual(); err == nil {
 		win.SetVisual(visual)
 	}
 	return
-}
-
-func (m *MainForm) Cancel() {
-	m.Window.Close()
-	m.Window.Destroy()
-	gtk.MainQuit()
-}
-
-func (m *MainForm) KeyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
-	ke := gdk.EventKeyNewFromEvent(e)
-	fmt.Println("Key pressed:", ke.KeyVal())
-
-	switch ke.KeyVal() {
-	case gdk.KEY_Q:
-		m.Cancel()
-	case gdk.KEY_q:
-		m.Cancel()
-	case gdk.KEY_Escape:
-		m.Cancel()
-	}
-}
-
-func (m *MainForm) AddButton(grid *gtk.Grid, index int, text string, path string, action func()) error {
-	image, err := gtk.ImageNewFromFile(path)
-	if err != nil {
-		return err
-	}
-	btn, err := gtk.ButtonNew()
-	if err != nil {
-		return err
-	}
-	btn.SetImage(image)
-	btn.Connect("clicked", action)
-
-	lbl, err := gtk.LabelNew(text)
-	if err != nil {
-		return err
-	}
-	lbl.SetName("buttonLabel")
-	lbl.SetMarkup("<b>" + text + "</b>")
-
-	grid.Attach(btn, index, 0, 1, 1)
-	grid.Attach(lbl, index, 1, 1, 1)
-
-	return nil
 }
