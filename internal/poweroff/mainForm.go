@@ -88,12 +88,20 @@ func (m *MainForm) KeyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
 	// fmt.Println("Key pressed:", ke.KeyVal())
 
 	switch ke.KeyVal() {
-	case gdk.KEY_Q:
+	case gdk.KEY_C, gdk.KEY_c, gdk.KEY_Q, gdk.KEY_q, gdk.KEY_Escape:
 		m.cancel()
-	case gdk.KEY_q:
-		m.cancel()
-	case gdk.KEY_Escape:
-		m.cancel()
+	case gdk.KEY_L, gdk.KEY_l:
+		m.lock()
+	case gdk.KEY_O, gdk.KEY_o:
+		m.logout()
+	case gdk.KEY_S, gdk.KEY_s:
+		m.suspend()
+	case gdk.KEY_H, gdk.KEY_h:
+		m.hibernate()
+	case gdk.KEY_P, gdk.KEY_p:
+		m.powerOff()
+	case gdk.KEY_R, gdk.KEY_r:
+		m.reboot()
 	}
 }
 
