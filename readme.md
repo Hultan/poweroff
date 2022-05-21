@@ -1,6 +1,8 @@
 # POWEROFF
 
-A Linux power-off application written in GTK and Go. The application can:
+A Linux power-off application written in GTK and Go. It probably only work on Linux Mint. 
+
+The application can:
 * Restart the computer
 * Turn off the computer
 * Hibernate the computer
