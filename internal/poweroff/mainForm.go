@@ -8,6 +8,7 @@ import (
 	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
+	"github.com/hultan/poweroff/internal/softmonitorInfo"
 	"github.com/hultan/softteam/framework"
 )
 
@@ -19,6 +20,7 @@ type MainForm struct {
 	Window      *gtk.ApplicationWindow
 	builder     *framework.GtkBuilder
 	AboutDialog *gtk.AboutDialog
+	extra       []*gtk.ApplicationWindow
 }
 
 var supportsAlpha bool
@@ -44,9 +46,7 @@ func (m *MainForm) OpenMainForm(app *gtk.Application) (err error) {
 
 	// Set up main window
 	m.Window.SetApplication(app)
-	m.Window.SetTitle("poweroff main window")
 	m.Window.SetDecorated(false)
-	m.Window.Maximize()
 	m.Window.SetName("mainWindow")
 
 	// Hook up events
@@ -75,8 +75,25 @@ func (m *MainForm) OpenMainForm(app *gtk.Application) (err error) {
 	TransparentBackground(win)
 	m.Window.Add(grid)
 
+	info := softmonitorInfo.NewSoftMonitorInfo()
+	monitors, err := info.GetMonitorInfo()
+
+	// Dim extra monitors
+	if len(monitors) > 1 {
+		for i := 1; i < len(monitors); i++ {
+			monitor := monitors[i]
+			w := m.createWindow(app, monitor)
+			m.extra = append(m.extra, w)
+			fmt.Printf("%d : %dx%d + %dx%d\n", monitor.Number, monitor.Width, monitor.Height, monitor.Top, monitor.Left)
+		}
+	}
+
 	// Show the main window
 	m.Window.ShowAll()
+	m.Window.Move(monitors[0].Left, monitors[0].Top)
+	m.Window.Fullscreen()
+	m.Window.SetKeepAbove(true)
+
 	gtk.Main()
 
 	return nil
@@ -192,4 +209,24 @@ button:hover {
 		win.SetVisual(visual)
 	}
 	return
+}
+
+func (m *MainForm) createWindow(app *gtk.Application, monitor softmonitorInfo.MonitorInfo) *gtk.ApplicationWindow {
+	// Get the main window from the glade file
+	win, err := gtk.ApplicationWindowNew(app)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	// Set up main window
+	win.SetDecorated(false)
+	win.SetName("mainWindow")
+	win.SetSizeRequest(monitor.Width, monitor.Height)
+	win.Move(monitor.Left, monitor.Top)
+	win.Fullscreen()
+	TransparentBackground(win)
+	win.ShowAll()
+	win.SetKeepAbove(true)
+	return win
 }

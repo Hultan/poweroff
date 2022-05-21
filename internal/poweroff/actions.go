@@ -72,6 +72,12 @@ func (m *MainForm) getActions() []action {
 func (m *MainForm) cancel() {
 	m.Window.Close()
 	m.Window.Destroy()
+
+	for _, window := range m.extra {
+		window.Close()
+		window.Destroy()
+	}
+
 	gtk.MainQuit()
 }
 
