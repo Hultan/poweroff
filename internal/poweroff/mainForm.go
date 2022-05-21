@@ -151,6 +151,11 @@ button {
 	border-top-left-radius: 10px;
 	border-bottom-left-radius: 10px;
 }
+button:hover {
+    background: #559955;
+    border-radius: 100px;
+    transition: all 1s ease;
+}
 #buttonLabel {
 	background-color : #222222;
 	margin-top : 10px;
