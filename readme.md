@@ -11,7 +11,7 @@ The application can:
 * Lock the computer
 * Cancel
 
-[Screenshot](assets/screenshot.png)
+![Screenshot](/assets/screenshot.png)
 
 ## LINKS
 Inspired by DistroTube : https://www.youtube.com/watch?v=ViW-bcNQ6Lc
