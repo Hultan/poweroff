@@ -21,8 +21,8 @@ func main() {
 		panic("Failed to create GTK Application : " + err.Error())
 	}
 
-	mainForm := poweroff.NewMainForm()
-	application.Connect("activate", mainForm.OpenMainForm)
+	powerOff := poweroff.PowerOff{}
+	application.Connect("activate", powerOff.StartApplication)
 
 	// Start the application (and exit when it is done)
 	os.Exit(application.Run(nil))

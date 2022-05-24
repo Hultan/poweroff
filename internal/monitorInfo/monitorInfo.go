@@ -1,4 +1,4 @@
-package softmonitorInfo
+package monitorInfo
 
 import (
 	"errors"
