@@ -11,7 +11,7 @@ import (
 )
 
 const applicationTitle = "poweroff"
-const applicationVersion = "v 0.01"
+const applicationVersion = "v 0.91"
 const applicationCopyRight = "©SoftTeam AB, 2020"
 
 type PowerOff struct {
