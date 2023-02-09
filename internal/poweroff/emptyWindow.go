@@ -1,23 +1,25 @@
 package poweroff
 
 import (
+	"github.com/gotk3/gotk3/gdk"
 	"github.com/gotk3/gotk3/gtk"
 
 	"github.com/hultan/poweroff/internal/monitorInfo"
 )
 
-type blankWindow struct {
-	gtk *gtk.Window
+type EmptyWindow struct {
+	mainWindow *MainWindow
+	gtk        *gtk.Window
 }
 
 // createBlankWindow creates a blank window to block extra screens
 // other than the main window.
-func createBlankWindow(monitor monitorInfo.MonitorInfo) (*blankWindow, error) {
+func createBlankWindow(mainWindow *MainWindow, monitor monitorInfo.MonitorInfo) (*EmptyWindow, error) {
 	aw, err := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	if err != nil {
 		return nil, err
 	}
-	win := &blankWindow{gtk: aw}
+	win := &EmptyWindow{mainWindow: mainWindow, gtk: aw}
 
 	// Set up main window
 	win.gtk.SetDecorated(false)
@@ -35,11 +37,18 @@ func createBlankWindow(monitor monitorInfo.MonitorInfo) (*blankWindow, error) {
 	win.gtk.SetKeepAbove(true)
 	win.gtk.SetCanFocus(false)
 
+	win.gtk.Connect("key-press-event", win.keyPressed)
+
 	return win, nil
 }
 
-// closeWindow  destroys the blankWindow
-func (w *blankWindow) closeWindow() {
+// closeWindow  destroys the EmptyWindow
+func (w *EmptyWindow) closeWindow() {
 	w.gtk.Close()
 	w.gtk.Destroy()
+}
+
+// keyPressed handles the key-press-event signal
+func (w *EmptyWindow) keyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
+	w.mainWindow.keyPressed(nil, e)
 }

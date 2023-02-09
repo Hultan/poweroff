@@ -9,20 +9,24 @@ import (
 	"github.com/hultan/poweroff/internal/monitorInfo"
 )
 
-type mainWindow struct {
+const applicationTitle = "PowerOff"
+const applicationVersion = "v 1.0.0"
+const applicationCopyRight = "©SoftTeam AB, 2020"
+
+type MainWindow struct {
 	app          *gtk.Application
 	gtk          *gtk.ApplicationWindow
 	grid         *gtk.Grid
 	monitors     []monitorInfo.MonitorInfo
-	emptyWindows []*blankWindow
+	emptyWindows []*EmptyWindow
 }
 
-func createMainWindow(app *gtk.Application, monitors []monitorInfo.MonitorInfo) (*mainWindow, error) {
+func createWindows(app *gtk.Application, monitors []monitorInfo.MonitorInfo) (*MainWindow, error) {
 	aw, err := gtk.ApplicationWindowNew(app)
 	if err != nil {
 		return nil, err
 	}
-	win := &mainWindow{app: app, gtk: aw}
+	win := &MainWindow{app: app, gtk: aw}
 
 	// Set up main window
 	win.gtk.SetDecorated(false)
@@ -50,7 +54,7 @@ func createMainWindow(app *gtk.Application, monitors []monitorInfo.MonitorInfo) 
 
 	// Add blank blocking windows for monitors other than the main monitor
 	for i := 1; i < len(monitors); i++ {
-		ew, err := createBlankWindow(monitors[i])
+		ew, err := createBlankWindow(win, monitors[i])
 		if err != nil {
 			return nil, err
 		}
@@ -60,8 +64,8 @@ func createMainWindow(app *gtk.Application, monitors []monitorInfo.MonitorInfo) 
 	return win, nil
 }
 
-// closeApplication destroys the emptyWindows and destroys the mainWindow
-func (w *mainWindow) closeApplication() {
+// closeApplication destroys the emptyWindows and destroys the MainWindow
+func (w *MainWindow) closeApplication() {
 	for _, e := range w.emptyWindows {
 		e.closeWindow()
 	}
@@ -71,7 +75,7 @@ func (w *mainWindow) closeApplication() {
 }
 
 // addActionButtons adds a button for each action
-func (w *mainWindow) addActionButtons() error {
+func (w *MainWindow) addActionButtons() error {
 	grid, err := gtk.GridNew()
 	if err != nil {
 		return err
@@ -97,7 +101,7 @@ func (w *mainWindow) addActionButtons() error {
 }
 
 // addButton adds a new action button
-func (w *mainWindow) addButton(grid *gtk.Grid, a action) error {
+func (w *MainWindow) addButton(grid *gtk.Grid, a action) error {
 	p := path.Join("/home/per/code/poweroff/assets", a.iconName)
 	image, err := gtk.ImageNewFromFile(p)
 	if err != nil {
@@ -126,7 +130,7 @@ func (w *mainWindow) addButton(grid *gtk.Grid, a action) error {
 }
 
 // keyPressed handles the key-press-event signal
-func (w *mainWindow) keyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
+func (w *MainWindow) keyPressed(_ *gtk.ApplicationWindow, e *gdk.Event) {
 	ke := gdk.EventKeyNewFromEvent(e)
 
 	switch ke.KeyVal() {

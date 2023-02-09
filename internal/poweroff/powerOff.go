@@ -10,10 +10,6 @@ import (
 	"github.com/hultan/poweroff/internal/monitorInfo"
 )
 
-const applicationTitle = "poweroff"
-const applicationVersion = "v 0.91"
-const applicationCopyRight = "©SoftTeam AB, 2020"
-
 type PowerOff struct {
 }
 
@@ -29,7 +25,7 @@ func (p *PowerOff) StartApplication(app *gtk.Application) (err error) {
 		return err
 	}
 
-	_, err = createMainWindow(app, monitors)
+	_, err = createWindows(app, monitors)
 	if err != nil {
 		return err
 	}

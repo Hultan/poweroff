@@ -13,7 +13,7 @@ type action struct {
 	action   func()
 }
 
-func (w *mainWindow) getActions() []action {
+func (w *MainWindow) getActions() []action {
 	return []action{
 		{
 			index:    0,
@@ -67,7 +67,7 @@ func (w *mainWindow) getActions() []action {
 	}
 }
 
-func (w *mainWindow) lock() {
+func (w *MainWindow) lock() {
 	err := w.runCommand("cinnamon-screensaver-command", "--lock")
 	if err != nil {
 		fmt.Println(err)
@@ -75,7 +75,7 @@ func (w *mainWindow) lock() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) logout() {
+func (w *MainWindow) logout() {
 	err := w.runCommand("cinnamon-session-quit", "--logout", "--force")
 	if err != nil {
 		fmt.Println(err)
@@ -83,7 +83,7 @@ func (w *mainWindow) logout() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) suspend() {
+func (w *MainWindow) suspend() {
 	err := w.runCommand("systemctl", "suspend")
 	if err != nil {
 		fmt.Println(err)
@@ -91,7 +91,7 @@ func (w *mainWindow) suspend() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) hibernate() {
+func (w *MainWindow) hibernate() {
 	err := w.runCommand("systemctl", "hibernate")
 	if err != nil {
 		w.suspend()
@@ -99,7 +99,7 @@ func (w *mainWindow) hibernate() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) powerOff() {
+func (w *MainWindow) powerOff() {
 	err := w.runCommand("systemctl", "poweroff")
 	if err != nil {
 		fmt.Println(err)
@@ -107,7 +107,7 @@ func (w *mainWindow) powerOff() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) reboot() {
+func (w *MainWindow) reboot() {
 	err := w.runCommand("systemctl", "reboot")
 	if err != nil {
 		fmt.Println(err)
@@ -115,7 +115,7 @@ func (w *mainWindow) reboot() {
 	w.gtk.Destroy()
 }
 
-func (w *mainWindow) runCommand(command string, args ...string) error {
+func (w *MainWindow) runCommand(command string, args ...string) error {
 	cmd := exec.Command(command, args...)
 	err := cmd.Run()
 	if err != nil {
